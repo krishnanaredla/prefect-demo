@@ -1,9 +1,12 @@
-from prefect import task, Flow
+from prefect import task
 import pandas as pd
 import numpy as np
-from typing import List, Tuple
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import  GridSearchCV
+from typing import List, Tuple,Dict
 from functools import reduce
-
+import pickle
 
 @task
 def load(obPath: str, ptPath: str, cnPath: str) -> Tuple[pd.DataFrame, ...]:
@@ -92,3 +95,27 @@ def transform(dataframes: Tuple[pd.DataFrame, ...]) -> pd.DataFrame:
     )
     data = data[data["RN"] == 1].drop("RN", axis=1)
     return data
+
+@task
+def model(data:pd.DataFrame,output:str,param_grid:Dict)->None:
+    df = data[["systolic", "diastolic", "hdl", "ldl", "bmi", "age", "diabetic"]]
+    df.sample(frac=1)
+    X = df.drop("diabetic", axis=1)
+    y = df["diabetic"]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    rfc = RandomForestClassifier(random_state=42)
+    gs_clf = GridSearchCV(rfc, param_grid=param_grid, cv=5, n_jobs=3, verbose=True)
+    gs_clf.fit(X_train, y_train)
+    pickle.dump(gs_clf, open(output, "wb"))
+    return None
+
+
+    
+#@task
+#def deploy(model):
+#    if st._is_running_with_streamlit:
+#        print("Running from python")
+#        streamlitApp(model)
+#    else:
+#        sys.argv = ["streamlit", "run", sys.argv[0]]
+#        sys.exit(stcli.main())
