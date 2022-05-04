@@ -1,7 +1,5 @@
 site_name: diabetic
 repo_url: https://github.com/nttda328/diabetic
-docs_dir: mkdocs
-site_dir: docs
 theme:
   name: material
   palette:
@@ -21,7 +19,7 @@ plugins:
   - search
   - gen-files:
       scripts:
-        - mkdocs/gen_ref_page.py
+        - docs/gen_ref_page.py
   - mkdocstrings:
       handlers:
         python:
