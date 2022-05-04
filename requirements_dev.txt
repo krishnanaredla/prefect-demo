@@ -1,0 +1,7 @@
+pytest
+black
+mkdocs
+mkdocs-material
+mkdocstrings
+mkdocs-gen-files
+coverage
