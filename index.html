@@ -64,6 +64,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#sample-prefect-flow" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -209,10 +214,63 @@
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
       
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Home
+          <span class="md-nav__icon md-icon"></span>
+        </label>
       
       <a href="." class="md-nav__link md-nav__link--active">
         Home
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prefect-installation" class="md-nav__link">
+    Prefect Installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diabetic-prediction-model" class="md-nav__link">
+    Diabetic Prediction Model
+  </a>
+  
+    <nav class="md-nav" aria-label="Diabetic Prediction Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    Documentation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -295,6 +353,43 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prefect-installation" class="md-nav__link">
+    Prefect Installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diabetic-prediction-model" class="md-nav__link">
+    Diabetic Prediction Model
+  </a>
+  
+    <nav class="md-nav" aria-label="Diabetic Prediction Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    Documentation
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -312,9 +407,48 @@
 
 
 
-  <h1>Home</h1>
-
-
+<h1 id="sample-prefect-flow">Sample Prefect Flow</h1>
+<p>Following is an example for a sample prefect flow</p>
+<h2 id="prefect-installation">Prefect Installation</h2>
+<p>Prefect documentation can be found her <a href="https://docs.prefect.io/">prefect</a></p>
+<p>for this tutorial we are using prefect local server </p>
+<p>Installtion</p>
+<div class="highlight"><pre><span></span><code><span class="err">$</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">prefect</span>
+</code></pre></div>
+<p>To use Prefect Server as the backend, run the following command to configure Prefect for local orchestration:</p>
+<div class="highlight"><pre><span></span><code><span class="err">$</span> <span class="n">prefect</span> <span class="n">backend</span> <span class="n">server</span>
+</code></pre></div>
+<p>Please note the server requires Docker and Docker Compose to be running.</p>
+<p>To start the server, UI, and all required infrastructure, run:</p>
+<p><div class="highlight"><pre><span></span><code><span class="err">$</span> <span class="n">prefect</span> <span class="n">server</span> <span class="n">start</span>
+</code></pre></div>
+When server is running, navigate to http://localhost:8080</p>
+<h2 id="diabetic-prediction-model">Diabetic Prediction Model</h2>
+<p>First we need to register a project in prefect</p>
+<div class="highlight"><pre><span></span><code><span class="err">$</span> <span class="n">prefect</span> <span class="n">create</span> <span class="n">project</span> <span class="n">sample</span>
+</code></pre></div>
+<p>We need to register our flow</p>
+<div class="highlight"><pre><span></span><code><span class="err">$</span> <span class="n">prefect</span> <span class="n">register</span> <span class="o">--</span><span class="n">project</span> <span class="s2">&quot;sample&quot;</span> <span class="o">--</span><span class="n">path</span> <span class="n">diabetic</span><span class="o">/</span><span class="n">flows</span><span class="o">.</span><span class="n">py</span>
+</code></pre></div>
+<p>we can also use the regsiter.py to register flow</p>
+<div class="highlight"><pre><span></span><code><span class="err">$</span> <span class="n">python</span> <span class="o">./</span><span class="n">register</span><span class="o">.</span><span class="n">py</span>
+</code></pre></div>
+<p>Run the flow</p>
+<p>use the customised pipeline.py for programmatic running of the flow or use prefect cli</p>
+<div class="highlight"><pre><span></span><code><span class="err">$</span> <span class="n">python</span> <span class="o">./</span><span class="n">pipeline</span><span class="o">.</span><span class="n">py</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="err">$</span> <span class="n">prefect</span> <span class="n">run</span> <span class="o">--</span><span class="n">project</span> <span class="s2">&quot;sample&quot;</span>  <span class="o">--</span><span class="n">name</span> <span class="s2">&quot;diabetic&quot;</span> <span class="o">--</span><span class="n">watch</span>
+</code></pre></div>
+<p>Use prefect UI to monitor the flow</p>
+<h3 id="documentation">Documentation</h3>
+<p><a href="https://www.mkdocs.org/">mkdocs</a> is used in for documentation</p>
+<ul>
+<li>Note : prefect flows can be visualized locally , for this graphviz needs to be installed and additional prefect dependencies (prefect[viz]) from pip must installed</li>
+</ul>
+<p>We use github pages to host the documentation of this project</p>
+<p><div class="highlight"><pre><span></span><code>$ mkdocs gh-deploy
+</code></pre></div>
+ Above will deploy gh pages </p>
 
               
             </article>
