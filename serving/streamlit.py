@@ -4,13 +4,21 @@ import pandas as pd
 import sys
 import pickle
 
+
 def inference(row, model, feat_cols):
+    """
+    Streamlit will be used to serve the model
+
+        URL: http://localhost:8501
+    """
     df = pd.DataFrame([row], columns=feat_cols)
     print(float(model.predict_proba(df)[0][1]))
     if float(model.predict_proba(df)[0][1]) < 0.5:
         return "This is a healthy person!"
     else:
         return "This person has high chances of having diabetics!"
+
+
 st.title("Diabetes Prediction App")
 st.write(
     "Please fill in the details of the person under consideration in the left sidebar and click on the button below!"
@@ -26,6 +34,6 @@ bmi = st.sidebar.slider("BMI", 0.0, 67.1, 31.4, 0.05)
 row = [systolic, diastolic, hdl, ldl, bmi, age]
 if st.button("Find Health Status"):
     feat_cols = ["systolic", "diastolic", "hdl", "ldl", "bmi", "age"]
-    model = pickle.load(open('./data/output/model.pkl', "rb"))
+    model = pickle.load(open("C:\work\prefect\diabetic\data\output\model.pkl", "rb"))
     result = inference(row, model, feat_cols)
     st.write(result)

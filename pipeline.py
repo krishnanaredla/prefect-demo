@@ -1,60 +1,85 @@
-from diabetic.flow import *
-import streamlit as st
-from streamlit import cli as stcli
-import os
-import streamlit.bootstrap
-from streamlit import config as _config
-from dask.distributed import Client
-from prefect.engine.executors import DaskExecutor
-
-dirname = os.path.dirname(__file__)
-filename = os.path.join(dirname, 'diabetic/streamlit.py')
-
-params = {
-    "conditions": "C:\work\prefect\diabetic\data\conditions.csv",
-    "patients": "C:\work\prefect\diabetic\data\patients.csv",
-    "observations": "C:\work\prefect\diabetic\data\observations.csv",
-    "grid": {
-        "n_estimators": [200, 500],
-        "max_features": ["auto", "sqrt", "log2"],
-        "max_depth": [4, 5, 6, 7, 8],
-        "criterion": ["gini", "entropy"],
-    },
-    "output" : "C:\work\prefect\diabetic\data\output\model.pkl"
-}
-
 from prefect.tasks.prefect.flow_run import (
         StartFlowRun
     )
-
-#diabetic_flow.register(project_name="diabetic")
-#diabetic_flow.run_agent()
-#state = diabetic_flow.run(**params)
 from prefect.client import Client
 import time
+from typing import Dict 
+import logging
+import sys
+from logging import Logger
+from logging.handlers import TimedRotatingFileHandler
+
 client = Client()
 
-flow_id = StartFlowRun(project_name="diabetic",
-            flow_name=diabetic_flow.name, parameters=params
-        ).run()
+
+class PipelineLogger(Logger):
+    def __init__(
+        self,
+        log_file=None,
+        log_format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        *args,
+        **kwargs
+    ):
+        self.formatter = logging.Formatter(log_format)
+        self.log_file = log_file
+
+        Logger.__init__(self, *args, **kwargs)
+
+        self.addHandler(self.get_console_handler())
+        if log_file:
+            self.addHandler(self.get_file_handler())
+        self.propagate = False
+
+    def get_console_handler(self):
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setFormatter(self.formatter)
+        return console_handler
+
+    def get_file_handler(self):
+        file_handler = TimedRotatingFileHandler(self.log_file, when="midnight")
+        file_handler.setFormatter(self.formatter)
+        return file_handler
 
 def getStatus(flow_id:str):
     finished = False
     while not finished:
         state = client.get_flow_run_info(flow_id).state
-        print(state.message.strip('.'))
-        time.sleep(10)
+        logger.info(state.message.strip('.'))
+        time.sleep(2)
         finished = state.is_finished()
     return state
 
+def main(project_name:str,flow_name:str,params:Dict)->None:
+    flow_id = StartFlowRun(project_name=project_name,
+            flow_name=flow_name, parameters=params
+        ).run()
+    state = getStatus(flow_id)
+    if state.is_successful():
+        logger.info("Completed Successfully")
+    elif state.is_failed():
+        logger.info("Flow was unsuccessfully")
+    else:
+        pass
 
-state = getStatus(flow_id)
+params = {
+    "conditions": "C:\work\prefect\diabetic\data\conditions.csv",
+    "patients": "C:\work\prefect\diabetic\data\patients.csv",
+    "observations": "C:\work\prefect\diabetic\data\observations.csv",
+    "output" : "C:\work\prefect\diabetic\data\output\model.pkl",
+    "testData" : [125,80,65.9,85.5,31.4,25]
+}
 
-if state.is_successful():
-    print("Completed Successfully")
-    #task_name = "trasnform"
-    #task_ref = diabetic_flow.get_tasks(name=task_name)[0]
-    #model = state.result[task_ref].result
-    #_config.set_option("server.headless", True)
-    #args = [params.get('output')]
-    #streamlit.bootstrap.run(filename,'',args,flag_options={})
+if __name__ == "__main__":
+    logger = PipelineLogger(name="Pipeline")
+    main(
+        project_name="sample",
+        flow_name="diabetic",
+        params=params
+    )
+
+
+
+
+
+
+
